@@ -35,7 +35,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
   final _channel = WebSocketChannel.connect(
-    Uri.parse('wss://echo.websocket.events'),
+    Uri.parse('ws://localhost:8080/getMessage'),
   );
 
   @override
@@ -75,7 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
-      _channel.sink.add("Message: " + _controller.text);
+      var jsonMessage = '{"message":"${_controller.text}"}';
+      _channel.sink.add(jsonMessage);
     }
   }
 
