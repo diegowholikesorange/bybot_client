@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -33,10 +34,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
   final _channel = WebSocketChannel.connect(
     Uri.parse('ws://localhost:8080/getMessage'),
   );
+
+  var logger = Logger();
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +55,9 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Form(
               child: TextFormField(
-                controller: _controller,
+                controller: _textController,
                 decoration: const InputDecoration(labelText: 'Send a message'),
+                onEditingComplete: _sendMessage,
               ),
             ),
             const SizedBox(height: 24),
@@ -74,8 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      var jsonMessage = '{"message":"${_controller.text}"}';
+    if (_textController.text.isNotEmpty) {
+      var jsonMessage = '{"message":"${_textController.text}"}';
+      logger.d("Sending message $jsonMessage");
       _channel.sink.add(jsonMessage);
     }
   }
@@ -83,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     _channel.sink.close();
-    _controller.dispose();
+    _textController.dispose();
     super.dispose();
   }
 }
